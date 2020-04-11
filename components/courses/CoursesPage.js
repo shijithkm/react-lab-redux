@@ -1,15 +1,19 @@
-import React from "react";
+import React, { Component } from 'react';
 import { connect } from "react-redux";
 import * as courseActions from "../../redux/actions/courseActions";
 import propTypes from "prop-types";
 
-class CoursePage extends React.Component {
-  state = {
-    course: {
+class CoursesPage extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      course: {
       title: ""
-    },
-    courses : []
-  };
+    }
+    }
+  }
 
   handlechange = event => {
     // Spread operator to copy couse into new const and over write with new title
@@ -20,38 +24,40 @@ class CoursePage extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log(this.state.course);
     this.props.createCourse(this.state.course);
+    this.setState(prevState => ({
+      course: {                   // object that we want to update
+          ...prevState.course,    // keep all other key-value pairs
+          title: ''               // update the value of specific key
+      }
+    }))
   };
 
+  renderCourses() {
+    return this.props.courses.map((course) => {
+      return <div key={course.title}>{course.title}</div>;
+    });
+  }
   render() {
-   return (
-      <div>
+    return (
       <form onSubmit={this.handleSubmit}>
-        <h2>Courses</h2>
-        <h3>Courses</h3>
+        <h2>Add Course</h2>
         <input
           type="text"
           onChange={this.handlechange}
           value={this.state.course.title}
         />
         <input type="submit" value="Save" />
-
-          {
-            this.props.courses.map(course=>{
-            console.log('Inside map',course);  
-            <div key={course.title}>{course.title}</div>
-          })
-          
-        }
-
+        <div>
+          {this.renderCourses()}
+        </div>
       </form>
-      </div>
+ 
     );
   }
 }
 
-CoursePage.propTypes = {
+CoursesPage.propTypes = {
   createCourse: propTypes.func.isRequired,
   courses: propTypes.array.isRequired,
 };
@@ -68,4 +74,4 @@ function mapDispatchToProps(dispatch){
     createCourse: course => dispatch(courseActions.createCourse(course))
   }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(CoursePage);
+export default connect(mapStateToProps,mapDispatchToProps)(CoursesPage);
